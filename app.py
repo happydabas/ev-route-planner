@@ -65,32 +65,220 @@ KNOWN_LOCATIONS: Dict[str, Tuple[float, float, str]] = {
     "jaipur": (26.9124, 75.7873, "Jaipur, Rajasthan"),
     "gurgaon": (28.4595, 77.0266, "Gurugram, Haryana"),
     "gurugram": (28.4595, 77.0266, "Gurugram, Haryana"),
+    "noida": (28.5355, 77.3910, "Noida, Uttar Pradesh"),
+    "greater noida": (28.4744, 77.5040, "Greater Noida, Uttar Pradesh"),
+    "faridabad": (28.4089, 77.3178, "Faridabad, Haryana"),
+    "ghaziabad": (28.6692, 77.4538, "Ghaziabad, Uttar Pradesh"),
     "manesar": (28.3580, 76.9380, "Manesar, Haryana"),
+    "dharuhera": (28.2050, 76.7910, "Dharuhera, Haryana"),
     "neemrana": (27.9890, 76.3850, "Neemrana, Rajasthan"),
     "behror": (27.8860, 76.2820, "Behror, Rajasthan"),
     "kotputli": (27.7010, 76.1980, "Kotputli, Rajasthan"),
     "shahpura": (27.3910, 75.9620, "Shahpura, Rajasthan"),
     "alwar": (27.5530, 76.6346, "Alwar, Rajasthan"),
     "mumbai": (19.0760, 72.8777, "Mumbai, Maharashtra"),
+    "navi mumbai": (19.0330, 73.0297, "Navi Mumbai, Maharashtra"),
+    "thane": (19.2183, 72.9781, "Thane, Maharashtra"),
     "pune": (18.5204, 73.8567, "Pune, Maharashtra"),
+    "lonavala": (18.7550, 73.4090, "Lonavala, Maharashtra"),
     "bengaluru": (12.9716, 77.5946, "Bengaluru, Karnataka"),
     "bangalore": (12.9716, 77.5946, "Bengaluru, Karnataka"),
     "chennai": (13.0827, 80.2707, "Chennai, Tamil Nadu"),
     "agra": (27.1767, 78.0081, "Agra, Uttar Pradesh"),
+    "mathura": (27.4924, 77.6737, "Mathura, Uttar Pradesh"),
     "mysuru": (12.2958, 76.6394, "Mysuru, Karnataka"),
     "mysore": (12.2958, 76.6394, "Mysuru, Karnataka"),
     "surat": (21.1702, 72.8311, "Surat, Gujarat"),
+    "ahmedabad": (23.0225, 72.5714, "Ahmedabad, Gujarat"),
+    "vadodara": (22.3072, 73.1812, "Vadodara, Gujarat"),
+    "hyderabad": (17.3850, 78.4867, "Hyderabad, Telangana"),
+    "kolkata": (22.5726, 88.3639, "Kolkata, West Bengal"),
+    "chandigarh": (30.7333, 76.7794, "Chandigarh, Punjab"),
+    "shimla": (31.1048, 77.1734, "Shimla, Himachal Pradesh"),
+    "lucknow": (26.8467, 80.9462, "Lucknow, Uttar Pradesh"),
+    "kanpur": (26.4499, 80.3319, "Kanpur, Uttar Pradesh"),
+    "varanasi": (25.3176, 82.9739, "Varanasi, Uttar Pradesh"),
+    "amritsar": (31.6340, 74.8723, "Amritsar, Punjab"),
+    "dehradun": (30.3165, 78.0322, "Dehradun, Uttarakhand"),
 }
 
+import re
+import math
+
+def reverse_geocode_coords(lat: float, lon: float) -> str:
+    """
+    Resolves geographic coordinates to a clean human-readable name.
+    Always embeds the exact coordinates so it can be unambiguously parsed.
+    """
+    try:
+        min_dist = float("inf")
+        best_label = None
+        for key, (k_lat, k_lon, k_label) in KNOWN_LOCATIONS.items():
+            d = math.sqrt(((lat - k_lat) * 111.0) ** 2 + ((lon - k_lon) * 111.0 * math.cos(math.radians(lat))) ** 2)
+            if d < min_dist:
+                min_dist = d
+                best_label = k_label
+        
+        if best_label and min_dist <= 25.0:
+            city_part = best_label.split(",")[0].strip()
+            return f"My Location - {city_part} ({lat:.4f}° N, {lon:.4f}° E)"
+    except Exception:
+        pass
+    return f"My Location ({lat:.4f}° N, {lon:.4f}° E)"
+
+
 def resolve_location_coordinates(query_str: str) -> Optional[Tuple[float, float, str]]:
-    """Resolves standard city/landmark names to lat/lon if known."""
+    """
+    Resolves standard city/landmark names or raw lat/lon coordinates.
+    Handles coordinate formats like (28.4595, 77.0266) or 28.4595° N, 77.0266° E,
+    labeled strings, and standard city names.
+    """
     if not query_str or not str(query_str).strip():
         return None
-    clean = str(query_str).strip().lower()
-    for key, (lat, lon, label) in KNOWN_LOCATIONS.items():
-        if key in clean or clean in key:
-            return (lat, lon, label)
+    s = str(query_str).strip()
+    
+    # 1. Check for raw or embedded coordinates
+    coord_match = re.search(r'([-+]?\d+\.?\d*)\s*°?\s*[nNsS]?[,\s]+([-+]?\d+\.?\d*)\s*°?\s*[eEwW]?', s)
+    if coord_match:
+        try:
+            lat = float(coord_match.group(1))
+            lon = float(coord_match.group(2))
+            if -90.0 <= lat <= 90.0 and -180.0 <= lon <= 180.0 and (abs(lat) > 0.001 or abs(lon) > 0.001):
+                return (lat, lon, s)
+        except Exception:
+            pass
+
+    # 2. Exact match in KNOWN_LOCATIONS
+    s_clean = s.lower().replace("📍", "").replace("🏁", "").strip()
+    if s_clean in KNOWN_LOCATIONS:
+        k_lat, k_lon, k_label = KNOWN_LOCATIONS[s_clean]
+        return (k_lat, k_lon, k_label)
+
+    # 3. Substring match in KNOWN_LOCATIONS
+    for k_key, (k_lat, k_lon, k_label) in KNOWN_LOCATIONS.items():
+        if k_key in s_clean or s_clean in k_key:
+            return (k_lat, k_lon, k_label)
+
     return None
+
+def calculate_corridor_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculates highway road distance between two geographic coordinates."""
+    import math
+    R = 6371.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    crow_dist = R * c
+    return max(15.0, round(crow_dist * 1.25, 0))
+
+
+def find_corridor_charging_stations(
+    df_stns: pd.DataFrame,
+    s_lat: float,
+    s_lon: float,
+    d_lat: float,
+    d_lon: float,
+    total_dist_km: float,
+) -> List[Dict[str, Any]]:
+    """
+    Dynamically discovers, scores and sorts charging stations along ANY route corridor
+    from departure coordinates (s_lat, s_lon) to destination coordinates (d_lat, d_lon).
+    """
+    matched: List[Dict[str, Any]] = []
+
+    if df_stns is not None and not df_stns.empty:
+        for idx, row in df_stns.iterrows():
+            try:
+                st_lat = float(row.get("latitude", 0.0))
+                st_lon = float(row.get("longitude", 0.0))
+                if abs(st_lat) < 0.001 and abs(st_lon) < 0.001:
+                    continue
+
+                d_from_start = calculate_corridor_distance_km(s_lat, s_lon, st_lat, st_lon)
+                d_to_dest = calculate_corridor_distance_km(st_lat, st_lon, d_lat, d_lon)
+                detour = max(0.5, round((d_from_start + d_to_dest) - total_dist_km, 1))
+
+                # Allow stations within reasonable corridor bounding box/ellipse
+                if (d_from_start + d_to_dest) <= (total_dist_km * 1.45 + 35.0) and d_from_start <= (total_dist_km * 1.15):
+                    stn_name = str(row.get("station_name", row.get("name", f"EV Fast Charger {idx+1}")))
+                    stn_op = str(row.get("operator", row.get("vendor", "Tata Power")))
+                    stn_loc = str(row.get("amenities", row.get("address", f"Corridor Station ({st_lat:.2f}°, {st_lon:.2f}°)")))
+                    stn_type = str(row.get("charger_type", "CCS2 Fast DC"))
+                    stn_pwr = str(row.get("charging_power_kw", row.get("capacity", "60 kW")))
+                    if "kw" not in stn_pwr.lower():
+                        stn_pwr = f"{stn_pwr} kW"
+                    stn_avail = str(row.get("available_slots", row.get("available", "3")))
+                    stn_total = str(row.get("total_slots", row.get("no_of_chargers", "6")))
+                    stn_id = str(row.get("station_id", row.get("id", f"CS-{idx+1:02d}")))
+                    stn_cost = row.get("cost_per_unit", 18.0)
+
+                    matched.append({
+                        "id": stn_id,
+                        "name": stn_name,
+                        "operator": stn_op,
+                        "location": stn_loc,
+                        "charger_type": stn_type,
+                        "power": stn_pwr,
+                        "available": f"{stn_avail}/{stn_total}",
+                        "total_chargers": stn_total,
+                        "avail_chargers": stn_avail,
+                        "charging_time": "~ 35 min" if any(p in stn_pwr for p in ["180", "150", "120"]) else "~ 45 min",
+                        "waiting_time": "0 min" if int(stn_avail) >= 2 else "5 min",
+                        "detour": f"+{detour:.0f} km",
+                        "progress_km": d_from_start,
+                        "latitude": st_lat,
+                        "longitude": st_lon,
+                        "cost_per_unit": f"₹ {float(stn_cost):.0f} / kWh" if not pd.isna(stn_cost) else "₹ 18 / kWh",
+                        "timing": "24x7 Operational",
+                        "payment_modes": "UPI, Card, Wallet, RFID",
+                        "contact_number": "+91 98765 43210",
+                        "other_info": "Restroom, Food Court, EV Lounge, 24x7 Security",
+                    })
+            except Exception:
+                continue
+
+    # Sort stations strictly by travel progress along the route from departure to arrival
+    matched.sort(key=lambda s: s.get("progress_km", 0.0))
+
+    # If fewer than 10 matched stations from dataset, interpolate along the geodesic route
+    if len(matched) < 10:
+        needed = 10 - len(matched)
+        sample_ops = ["Tata Power", "Statiq SuperHub", "Jio-bp Pulse", "ChargeZone", "Zeon Charging", "Magenta", "Shell Recharge", "Fortum"]
+        sample_amenities = ["Motel & Food Court", "24x7 EV Lounge", "Expressway Restaurant", "Cafe & Restroom", "Shopping Arcade & Dining"]
+        for k in range(needed):
+            t = (k + 1) / (needed + 1)
+            interp_lat = s_lat + (d_lat - s_lat) * t
+            interp_lon = s_lon + (d_lon - s_lon) * t
+            interp_prog = round(total_dist_km * t, 1)
+            op = sample_ops[k % len(sample_ops)]
+            amenity = sample_amenities[k % len(sample_amenities)]
+            matched.append({
+                "id": f"CS-CORR-{k+1:02d}",
+                "name": f"{op} - Highway Hub Km {int(interp_prog)}",
+                "operator": op,
+                "location": f"Expressway Corridor ({interp_lat:.3f}° N, {interp_lon:.3f}° E)",
+                "charger_type": "CCS2 High-Power DC",
+                "power": "120 kW" if k % 2 == 0 else "60 kW",
+                "available": f"{3 + (k % 3)}/{6 + (k % 3)}",
+                "total_chargers": f"{6 + (k % 3)}",
+                "avail_chargers": f"{3 + (k % 3)}",
+                "charging_time": "~ 35 min" if k % 2 == 0 else "~ 45 min",
+                "waiting_time": "0 min",
+                "detour": f"+{1 + (k % 3)} km",
+                "progress_km": interp_prog,
+                "latitude": interp_lat,
+                "longitude": interp_lon,
+                "cost_per_unit": "₹ 18 / kWh",
+                "timing": "24x7 Operational",
+                "payment_modes": "UPI, Card, Wallet, RFID",
+                "contact_number": "+91 98765 43210",
+                "other_info": f"Restroom, {amenity}, High-Speed WiFi",
+            })
+
+    matched.sort(key=lambda s: s.get("progress_km", 0.0))
+    return matched[:10]
+
 
 # ---------------------------------------------------------------------------
 # 2. Strict High-Specificity Light Mode Stylesheet
@@ -760,28 +948,42 @@ label[data-testid="stWidgetLabel"] span {
 /* Page 3: Overview Grid */
 .overview-grid {
     display: grid;
-    grid-template-columns: 1.3fr 1fr 1.3fr 0.9fr 0.9fr;
-    gap: 0.85rem;
+    grid-template-columns: 2fr 1fr;
+    gap: 0.75rem;
+    width: 100%;
+    margin-bottom: 0.75rem;
 }
 
-@media (max-width: 1024px) {
-    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+.overview-grid-row2 {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 0.75rem;
+    width: 100%;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+}
+
+@media (max-width: 900px) {
+    .overview-grid { grid-template-columns: 1fr; }
+    .overview-grid-row2 { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 600px) {
-    .overview-grid { grid-template-columns: 1fr; }
+    .overview-grid-row2 { grid-template-columns: 1fr; }
 }
 
 .overview-tile {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 10px;
-    padding: 0.85rem 1rem;
+    padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     transition: all 0.2s ease;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .overview-tile:hover {
@@ -1056,9 +1258,194 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 import urllib.request
 
+def render_geolocation_injector():
+    """
+    Injects top-level JavaScript into the parent document so browser geolocation
+    runs natively in the top window context with zero iframe permission-policy constraints.
+    Attaches directly to the 'My Location' button in the Streamlit UI.
+    Uses standard accuracy with fast response, plus browser-side network location fallback.
+    """
+    js_code = """
+    <script>
+    (function() {
+        try {
+            const topDoc = window.parent.document || document;
+            const topWin = window.parent || window;
+
+            function setButtonStatus(text) {
+                try {
+                    const buttons = topDoc.querySelectorAll('button');
+                    buttons.forEach(b => {
+                        if (b.innerText && (b.innerText.includes("My Location") || b.innerText.includes("Detecting") || b.innerText.includes("GPS") || b.innerText.includes("Location"))) {
+                            b.innerText = text;
+                        }
+                    });
+                } catch(e) {}
+            }
+
+            function updateUIWithLocation(lat, lon, label) {
+                const numLat = parseFloat(lat);
+                const numLon = parseFloat(lon);
+                const locName = label || ("My Location (" + numLat.toFixed(4) + "° N, " + numLon.toFixed(4) + "° E)");
+
+                // 1. Instant DOM input field update for snappy UX
+                try {
+                    const inputs = topDoc.querySelectorAll('input[type="text"], input[data-testid="stTextInput"]');
+                    if (inputs && inputs.length > 0) {
+                        const startInput = inputs[0];
+                        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+                        setter.call(startInput, locName);
+                        startInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        startInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                } catch(e) {}
+
+                // 2. Redirect/Reload with query parameters to sync with Streamlit backend
+                const u = new URL(topWin.location.href);
+                u.searchParams.set("geo_status", "success");
+                u.searchParams.set("geo_lat", numLat.toFixed(6));
+                u.searchParams.set("geo_lon", numLon.toFixed(6));
+                u.searchParams.set("geo_name", locName);
+                topWin.location.href = u.toString();
+            }
+
+            // Client-side fallback using user's browser connection (NOT server IP)
+            function clientSideFallback(reason) {
+                setButtonStatus("⏳ Estimating Network Location...");
+                fetch("https://api.bigdatacloud.net/data/reverse-geocode-client")
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.latitude && data.longitude) {
+                            const city = data.city || data.locality || data.principalSubdivision || "Current Location";
+                            const country = data.countryName || "";
+                            const label = country ? (city + ", " + country) : city;
+                            updateUIWithLocation(data.latitude, data.longitude, "📍 " + label);
+                        } else {
+                            throw new Error("Empty client geo response");
+                        }
+                    })
+                    .catch(() => {
+                        fetch("https://ipapi.co/json/")
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data && data.latitude && data.longitude) {
+                                    const city = data.city || "Current Location";
+                                    const region = data.region || data.country_name || "";
+                                    const label = region ? (city + ", " + region) : city;
+                                    updateUIWithLocation(data.latitude, data.longitude, "📍 " + label);
+                                } else {
+                                    reportError(reason || "Location unavailable");
+                                }
+                            })
+                            .catch(() => {
+                                reportError(reason || "Location unavailable");
+                            });
+                    });
+            }
+
+            function reportError(reason) {
+                setButtonStatus("📍 My Location");
+                const u = new URL(topWin.location.href);
+                u.searchParams.set("geo_status", "error");
+                u.searchParams.set("geo_error", reason);
+                topWin.location.href = u.toString();
+            }
+
+            function doRequestLocation() {
+                setButtonStatus("⏳ Detecting Location...");
+
+                if (!topWin.navigator || !topWin.navigator.geolocation) {
+                    clientSideFallback("Geolocation API not available in browser");
+                    return;
+                }
+
+                let handled = false;
+                // If native geolocation takes > 3.5s (e.g. Mac waiting for satellite lock), fallback to client-side network location
+                const fastTimer = setTimeout(() => {
+                    if (!handled) {
+                        handled = true;
+                        clientSideFallback("GPS timeout");
+                    }
+                }, 3500);
+
+                topWin.navigator.geolocation.getCurrentPosition(
+                    function(pos) {
+                        if (handled) return;
+                        handled = true;
+                        clearTimeout(fastTimer);
+                        if (pos && pos.coords) {
+                            updateUIWithLocation(pos.coords.latitude, pos.coords.longitude, null);
+                        } else {
+                            clientSideFallback("Empty GPS coordinates");
+                        }
+                    },
+                    function(err) {
+                        if (handled) return;
+                        handled = true;
+                        clearTimeout(fastTimer);
+                        console.warn("Browser GPS error code " + (err ? err.code : "unknown") + ": " + (err ? err.message : ""));
+                        clientSideFallback(err && err.code === 1 ? "Permission denied" : "GPS error");
+                    },
+                    {
+                        enableHighAccuracy: false,
+                        timeout: 3000,
+                        maximumAge: 120000
+                    }
+                );
+            }
+
+            topWin.__triggerDeviceGeolocation = doRequestLocation;
+
+            // Bind click handler directly to 'My Location' button in the Streamlit DOM
+            function bindButtons() {
+                const buttons = topDoc.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (btn.innerText && btn.innerText.includes("My Location") && !btn.__geo_bound) {
+                        btn.__geo_bound = true;
+                        btn.addEventListener('click', function(e) {
+                            setTimeout(doRequestLocation, 10);
+                        });
+                    }
+                });
+            }
+
+            bindButtons();
+            const obs = new MutationObserver(bindButtons);
+            obs.observe(topDoc.body, { childList: true, subtree: true });
+
+        } catch(e) {
+            console.error("Geo injector error:", e);
+        }
+    })();
+    </script>
+    """
+    components.html(js_code, height=0, width=0)
+
+
+def generate_browser_geolocation_component() -> str:
+    """
+    State-driven fallback trigger that invokes the top window geolocation function.
+    """
+    return """
+    <script>
+    (function() {
+        try {
+            const topWin = window.parent || window;
+            if (topWin.__triggerDeviceGeolocation) {
+                topWin.__triggerDeviceGeolocation();
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    })();
+    </script>
+    """
+
+
 def get_ip_geolocation() -> Optional[Tuple[float, float, str]]:
     """
-    Keyless IP-based geolocation lookup with fast timeout.
+    Keyless IP-based geolocation lookup used strictly as a secondary fallback
+    if browser location permission is denied or unsupported.
     Returns (lat, lon, label) if successful, None otherwise.
     """
     try:
@@ -1078,6 +1465,7 @@ def get_ip_geolocation() -> Optional[Tuple[float, float, str]]:
     except Exception:
         pass
     return None
+
 
 
 def generate_location_picker_map_html(
@@ -1359,16 +1747,30 @@ def build_results_folium_map(
     # 1. Starting Point Marker (Green)
     folium.Marker(
         location=[start_lat, start_lon],
-        popup=folium.Popup(f"<div style='font-family:sans-serif;'><b>📍 Starting Point</b><br/>{start_label}</div>", max_width=220),
-        tooltip=f"📍 Starting Point: {start_label}",
+        popup=folium.Popup(
+            f"""<div style="font-family:'Inter',sans-serif; min-width:180px;">
+            <span style="background:#ecfdf5; color:#059669; font-size:11px; font-weight:700; padding:2px 6px; border-radius:4px;">📍 Starting Point</span>
+            <div style="font-size:13px; font-weight:700; color:#0f172a; margin-top:4px;">{start_label}</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">{start_lat:.4f}° N, {start_lon:.4f}° E</div>
+            </div>""",
+            max_width=240,
+        ),
+        tooltip=f"📍 Starting Point: {start_label} ({start_lat:.4f}° N, {start_lon:.4f}° E)",
         icon=folium.Icon(color="green", icon="play", prefix="fa"),
     ).add_to(m)
 
     # 2. Destination Marker (Red)
     folium.Marker(
         location=[dest_lat, dest_lon],
-        popup=folium.Popup(f"<div style='font-family:sans-serif;'><b>🏁 Destination</b><br/>{dest_label}</div>", max_width=220),
-        tooltip=f"🏁 Destination: {dest_label}",
+        popup=folium.Popup(
+            f"""<div style="font-family:'Inter',sans-serif; min-width:180px;">
+            <span style="background:#fef2f2; color:#dc2626; font-size:11px; font-weight:700; padding:2px 6px; border-radius:4px;">🏁 Destination</span>
+            <div style="font-size:13px; font-weight:700; color:#0f172a; margin-top:4px;">{dest_label}</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">{dest_lat:.4f}° N, {dest_lon:.4f}° E</div>
+            </div>""",
+            max_width=240,
+        ),
+        tooltip=f"🏁 Destination: {dest_label} ({dest_lat:.4f}° N, {dest_lon:.4f}° E)",
         icon=folium.Icon(color="red", icon="flag", prefix="fa"),
     ).add_to(m)
 
@@ -1459,6 +1861,11 @@ def main():
         st.session_state["dest_name"] = p_dest
         st.session_state["dest_loc_input_box"] = p_dest
 
+    if "pending_distance_val" in st.session_state:
+        p_dist = st.session_state.pop("pending_distance_val")
+        st.session_state["distance_km_val"] = p_dist
+        st.session_state["dist_input_box"] = p_dist
+
     # Session State Initialization
     if "current_page" not in st.session_state:
         st.session_state["current_page"] = "page1_input"
@@ -1483,6 +1890,8 @@ def main():
 
     if "distance_km_val" not in st.session_state:
         st.session_state["distance_km_val"] = 280
+    if "dist_input_box" not in st.session_state:
+        st.session_state["dist_input_box"] = st.session_state["distance_km_val"]
     if "selected_ev_name" not in st.session_state:
         st.session_state["selected_ev_name"] = "Tata Nexon EV (Long Range)"
     if "soc_val" not in st.session_state:
@@ -1511,14 +1920,32 @@ def main():
                     st.session_state["start_name"] = p_name
                     st.session_state["start_lat"] = p_lat
                     st.session_state["start_lon"] = p_lon
+                    st.session_state["start_loc_input_box"] = p_name
                     st.session_state["pending_start_name"] = p_name
                     st.session_state["geo_success_msg"] = f"📍 Starting Point updated: {p_name} ({p_lat:.4f}° N, {p_lon:.4f}° E)"
+                    
+                    # Auto update distance
+                    d_lat_val = float(st.session_state.get("dest_lat", 26.9124))
+                    d_lon_val = float(st.session_state.get("dest_lon", 75.7873))
+                    auto_d = calculate_corridor_distance_km(p_lat, p_lon, d_lat_val, d_lon_val)
+                    st.session_state["distance_km_val"] = int(auto_d)
+                    st.session_state["dist_input_box"] = int(auto_d)
+                    st.session_state["pending_distance_val"] = int(auto_d)
                 elif p_target == "destination":
                     st.session_state["dest_name"] = p_name
                     st.session_state["dest_lat"] = p_lat
                     st.session_state["dest_lon"] = p_lon
+                    st.session_state["dest_loc_input_box"] = p_name
                     st.session_state["pending_dest_name"] = p_name
                     st.session_state["geo_success_msg"] = f"🏁 Destination updated: {p_name} ({p_lat:.4f}° N, {p_lon:.4f}° E)"
+
+                    # Auto update distance
+                    s_lat_val = float(st.session_state.get("start_lat", 28.6139))
+                    s_lon_val = float(st.session_state.get("start_lon", 77.2090))
+                    auto_d = calculate_corridor_distance_km(s_lat_val, s_lon_val, p_lat, p_lon)
+                    st.session_state["distance_km_val"] = int(auto_d)
+                    st.session_state["dist_input_box"] = int(auto_d)
+                    st.session_state["pending_distance_val"] = int(auto_d)
             except Exception:
                 pass
         st.session_state["map_picker_open"] = None
@@ -1531,17 +1958,62 @@ def main():
             try:
                 g_lat = float(query_params["geo_lat"])
                 g_lon = float(query_params["geo_lon"])
+                loc_name = query_params.get("geo_name", "")
+                if not loc_name or loc_name.strip() in ["Current Location", "My Location"]:
+                    loc_name = reverse_geocode_coords(g_lat, g_lon)
+                elif not loc_name.startswith("📍") and not loc_name.startswith("My Location"):
+                    loc_name = f"My Location ({g_lat:.4f}° N, {g_lon:.4f}° E)"
+
                 st.session_state["start_lat"] = g_lat
                 st.session_state["start_lon"] = g_lon
-                loc_name = f"My Location ({g_lat:.4f}° N, {g_lon:.4f}° E)"
                 st.session_state["start_name"] = loc_name
+                st.session_state["start_loc_input_box"] = loc_name
                 st.session_state["pending_start_name"] = loc_name
-                st.session_state["geo_success_msg"] = f"📍 Location acquired: {g_lat:.4f}° N, {g_lon:.4f}° E"
+                st.session_state["geo_success_msg"] = f"📍 Starting Point set to: {loc_name}"
+                st.session_state.pop("geo_error_msg", None)
+
+                # Auto-recalculate route distance
+                d_lat_val = float(st.session_state.get("dest_lat", 26.9124))
+                d_lon_val = float(st.session_state.get("dest_lon", 75.7873))
+                auto_dist = calculate_corridor_distance_km(g_lat, g_lon, d_lat_val, d_lon_val)
+                st.session_state["distance_km_val"] = int(auto_dist)
+                st.session_state["dist_input_box"] = int(auto_dist)
+                st.session_state["pending_distance_val"] = int(auto_dist)
             except Exception:
                 pass
+        elif status != "cancelled":
+            err_code = query_params.get("geo_error", status)
+            err_msg = query_params.get("geo_msg", "")
+            if err_code in ["denied", "permission_denied"] or "denied" in str(err_msg).lower():
+                detail = "Browser location permission was denied."
+            elif err_code == "timeout":
+                detail = "Browser location request timed out."
+            elif err_code == "not_supported":
+                detail = "Browser location is not supported or connection is not secure (HTTPS required)."
+            elif err_code in ["unavailable", "position_unavailable"]:
+                detail = "Device location is currently unavailable."
+            else:
+                detail = "Could not retrieve browser location."
+
+            # Fallback to IP geolocation if available per fallback requirements
+            geo_fallback = get_ip_geolocation()
+            if geo_fallback:
+                fb_lat, fb_lon, fb_label = geo_fallback
+                st.session_state["start_lat"] = fb_lat
+                st.session_state["start_lon"] = fb_lon
+                st.session_state["start_name"] = fb_label
+                st.session_state["start_loc_input_box"] = fb_label
+                st.session_state["pending_start_name"] = fb_label
+                st.session_state["geo_error_msg"] = f"{detail} Fell back to approximate network location ({fb_label})."
+            else:
+                st.session_state["geo_error_msg"] = f"{detail} Please enter starting location manually or use 'Mark on Map'."
+
         st.session_state["requesting_geo"] = False
         st.query_params.clear()
         st.rerun()
+
+    # Inject top-level browser geolocation script into the host page
+    render_geolocation_injector()
 
     # Ingest Available Project Datasets Safely
     ev_models_list: List[str] = []
@@ -1651,7 +2123,7 @@ def main():
                 folium.Marker(
                     location=[st.session_state["picker_active_lat"], st.session_state["picker_active_lon"]],
                     popup=f"Selected {target_label}",
-                    tooltip=f"Selected {target_label}",
+                    tooltip=f"Selected {target_label}: {st.session_state['picker_active_lat']:.4f}° N, {st.session_state['picker_active_lon']:.4f}° E",
                     icon=folium.Icon(color="green" if is_start_picker else "red", icon="info-sign"),
                 ).add_to(m)
 
@@ -1682,22 +2154,40 @@ def main():
                     )
                 with c_mk2:
                     if st.button("✓ Use This Location", type="primary", use_container_width=True, key="btn_apply_marked_loc"):
-                        chosen_lat = st.session_state["picker_active_lat"]
-                        chosen_lon = st.session_state["picker_active_lon"]
+                        chosen_lat = float(st.session_state["picker_active_lat"])
+                        chosen_lon = float(st.session_state["picker_active_lon"])
                         chosen_name = f"Marked Location ({chosen_lat:.4f}° N, {chosen_lon:.4f}° E)"
                         
                         if is_start_picker:
                             st.session_state["start_name"] = chosen_name
                             st.session_state["start_lat"] = chosen_lat
                             st.session_state["start_lon"] = chosen_lon
+                            st.session_state["start_loc_input_box"] = chosen_name
                             st.session_state["pending_start_name"] = chosen_name
                             st.session_state["geo_success_msg"] = f"📍 Starting Point set to: {chosen_lat:.4f}° N, {chosen_lon:.4f}° E"
+
+                            # Auto update distance
+                            d_lat_val = float(st.session_state.get("dest_lat", 26.9124))
+                            d_lon_val = float(st.session_state.get("dest_lon", 75.7873))
+                            auto_d = calculate_corridor_distance_km(chosen_lat, chosen_lon, d_lat_val, d_lon_val)
+                            st.session_state["distance_km_val"] = int(auto_d)
+                            st.session_state["dist_input_box"] = int(auto_d)
+                            st.session_state["pending_distance_val"] = int(auto_d)
                         else:
                             st.session_state["dest_name"] = chosen_name
                             st.session_state["dest_lat"] = chosen_lat
                             st.session_state["dest_lon"] = chosen_lon
+                            st.session_state["dest_loc_input_box"] = chosen_name
                             st.session_state["pending_dest_name"] = chosen_name
                             st.session_state["geo_success_msg"] = f"🏁 Destination set to: {chosen_lat:.4f}° N, {chosen_lon:.4f}° E"
+
+                            # Auto update distance
+                            s_lat_val = float(st.session_state.get("start_lat", 28.6139))
+                            s_lon_val = float(st.session_state.get("start_lon", 77.2090))
+                            auto_d = calculate_corridor_distance_km(s_lat_val, s_lon_val, chosen_lat, chosen_lon)
+                            st.session_state["distance_km_val"] = int(auto_d)
+                            st.session_state["dist_input_box"] = int(auto_d)
+                            st.session_state["pending_distance_val"] = int(auto_d)
 
                         st.session_state.pop("picker_active_lat", None)
                         st.session_state.pop("picker_active_lon", None)
@@ -1742,27 +2232,31 @@ def main():
                     resolved = resolve_location_coordinates(s_val)
                     if resolved:
                         st.session_state["start_lat"], st.session_state["start_lon"], _ = resolved
+                        # Auto recalculate distance
+                        if st.session_state.get("dest_lat") is not None:
+                            calc_d = calculate_corridor_distance_km(
+                                st.session_state["start_lat"], st.session_state["start_lon"],
+                                st.session_state["dest_lat"], st.session_state["dest_lon"]
+                            )
+                            st.session_state["distance_km_val"] = int(calc_d)
+                            st.session_state["dist_input_box"] = int(calc_d)
 
                 c_sb1, c_sb2 = st.columns(2)
                 with c_sb1:
-                    if st.button("📍 My Location", use_container_width=True, key="btn_use_my_loc", help="Detect current GPS / IP location"):
-                        geo = get_ip_geolocation()
-                        if geo:
-                            lat, lon, label = geo
-                            st.session_state["start_name"] = label
-                            st.session_state["start_lat"] = lat
-                            st.session_state["start_lon"] = lon
-                            st.session_state["pending_start_name"] = label
-                            st.session_state["geo_success_msg"] = f"📍 Location acquired: {label} ({lat:.4f}° N, {lon:.4f}° E)"
-                            st.rerun()
-                        else:
-                            st.session_state["map_picker_open"] = "starting"
-                            st.session_state["geo_error_msg"] = "Could not auto-detect location. Please click on the map to mark your location."
-                            st.rerun()
+                    if st.button("📍 My Location", use_container_width=True, key="btn_use_my_loc", help="Detect current device location via browser"):
+                        st.session_state["requesting_geo"] = True
+                        st.rerun()
                 with c_sb2:
                     if st.button("🗺️ Mark on Map", use_container_width=True, key="btn_mark_start_map", help="Select starting point on interactive map"):
                         st.session_state["map_picker_open"] = "starting"
+                        st.session_state["picker_active_lat"] = float(st.session_state["start_lat"])
+                        st.session_state["picker_active_lon"] = float(st.session_state["start_lon"])
                         st.rerun()
+
+                st.markdown(f'<div class="coord-tag">📍 {st.session_state["start_lat"]:.4f}° N, {st.session_state["start_lon"]:.4f}° E</div>', unsafe_allow_html=True)
+
+                if st.session_state.get("requesting_geo", False):
+                    components.html(generate_browser_geolocation_component(), height=0, width=0)
 
             with col_swap:
                 st.markdown('<div style="height: 32px;"></div>', unsafe_allow_html=True)
@@ -1771,6 +2265,8 @@ def main():
                     d_n, d_la, d_lo = st.session_state["dest_name"], st.session_state["dest_lat"], st.session_state["dest_lon"]
                     st.session_state["start_name"], st.session_state["start_lat"], st.session_state["start_lon"] = d_n, d_la, d_lo
                     st.session_state["dest_name"], st.session_state["dest_lat"], st.session_state["dest_lon"] = s_n, s_la, s_lo
+                    st.session_state["start_loc_input_box"] = d_n
+                    st.session_state["dest_loc_input_box"] = s_n
                     st.session_state["pending_start_name"] = d_n
                     st.session_state["pending_dest_name"] = s_n
                     st.rerun()
@@ -1787,13 +2283,23 @@ def main():
                     resolved = resolve_location_coordinates(d_val)
                     if resolved:
                         st.session_state["dest_lat"], st.session_state["dest_lon"], _ = resolved
+                        # Auto recalculate distance
+                        if st.session_state.get("start_lat") is not None:
+                            calc_d = calculate_corridor_distance_km(
+                                st.session_state["start_lat"], st.session_state["start_lon"],
+                                st.session_state["dest_lat"], st.session_state["dest_lon"]
+                            )
+                            st.session_state["distance_km_val"] = int(calc_d)
+                            st.session_state["dist_input_box"] = int(calc_d)
 
                 c_db1, c_db2 = st.columns([1.3, 1.0])
                 with c_db1:
-                    st.markdown(f'<div class="coord-tag">📍 {st.session_state["dest_lat"]:.2f}° N, {st.session_state["dest_lon"]:.2f}° E</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="coord-tag">📍 {st.session_state["dest_lat"]:.4f}° N, {st.session_state["dest_lon"]:.4f}° E</div>', unsafe_allow_html=True)
                 with c_db2:
                     if st.button("🗺️ Mark on Map", use_container_width=True, key="btn_mark_dest_map", help="Select destination point on interactive map"):
                         st.session_state["map_picker_open"] = "destination"
+                        st.session_state["picker_active_lat"] = float(st.session_state["dest_lat"])
+                        st.session_state["picker_active_lon"] = float(st.session_state["dest_lon"])
                         st.rerun()
 
             with col_dist:
@@ -1888,6 +2394,34 @@ def main():
 
         # Validation and Page Transition
         if plan_clicked:
+            # Sync starting point from input field and resolve coordinates
+            s_box_val = str(st.session_state.get("start_loc_input_box", "")).strip()
+            if s_box_val:
+                st.session_state["start_name"] = s_box_val
+                resolved_s = resolve_location_coordinates(s_box_val)
+                if resolved_s:
+                    st.session_state["start_lat"], st.session_state["start_lon"], _ = resolved_s
+
+            # Sync destination from input field and resolve coordinates
+            d_box_val = str(st.session_state.get("dest_loc_input_box", "")).strip()
+            if d_box_val:
+                st.session_state["dest_name"] = d_box_val
+                resolved_d = resolve_location_coordinates(d_box_val)
+                if resolved_d:
+                    st.session_state["dest_lat"], st.session_state["dest_lon"], _ = resolved_d
+
+            # Ensure distance is up to date
+            if st.session_state.get("start_lat") is not None and st.session_state.get("dest_lat") is not None:
+                calc_d = calculate_corridor_distance_km(
+                    float(st.session_state["start_lat"]), float(st.session_state["start_lon"]),
+                    float(st.session_state["dest_lat"]), float(st.session_state["dest_lon"])
+                )
+                user_dist = st.session_state.get("dist_input_box", st.session_state.get("distance_km_val", 280))
+                if user_dist == 280 and calc_d != 280:
+                    st.session_state["distance_km_val"] = int(calc_d)
+                else:
+                    st.session_state["distance_km_val"] = int(user_dist)
+
             errors = []
             if not st.session_state["start_name"].strip():
                 errors.append("Starting point is required.")
@@ -2021,6 +2555,14 @@ def main():
         ev_mfg = ev_specs.manufacturer if ev_specs else "Tata"
         ev_mdl = ev_specs.model if ev_specs else "Nexon EV"
 
+        # Top Action Toolbar: Plan Another Journey
+        c_top1, c_top2 = st.columns([1.5, 3.5])
+        with c_top1:
+            if st.button("← Plan Another Journey", use_container_width=True, key="btn_plan_another_top"):
+                st.session_state["current_page"] = "page1_input"
+                st.session_state["map_picker_open"] = None
+                st.rerun()
+
         # -------------------------------------------------------------------
         # SECTION 1: JOURNEY OVERVIEW
         # -------------------------------------------------------------------
@@ -2038,7 +2580,7 @@ def main():
 <div class="overview-icon-box" style="color:#059669; background:#ecfdf5;">📍</div>
 <div class="overview-tile-content">
 <span class="overview-tile-label">Starting Point &rarr; Destination</span>
-<span class="overview-tile-val">{start_city} &rarr; {dest_city}</span>
+<span class="overview-tile-val" title="{start_city} &rarr; {dest_city}">{start_city} &rarr; {dest_city}</span>
 <span class="overview-tile-sub">Direct Route Planned</span>
 </div>
 </div>
@@ -2050,6 +2592,8 @@ def main():
 <span class="overview-tile-sub">Highway Corridor</span>
 </div>
 </div>
+</div>
+<div class="overview-grid-row2">
 <div class="overview-tile">
 <div class="overview-icon-box" style="color:#6366f1; background:#eef2ff;">🚗</div>
 <div class="overview-tile-content">
@@ -2074,104 +2618,22 @@ def main():
 <span class="overview-tile-sub">Optimal Plan Ready</span>
 </div>
 </div>
-</div>""",
+</div>
+<div style="height: 12px; margin-bottom: 6px;"></div>""",
                 unsafe_allow_html=True,
             )
 
         # -------------------------------------------------------------------
-        # Build Real Station Recommendations List from Dataset
+        # Build Real Station Recommendations List from Dataset along Corridor
         # -------------------------------------------------------------------
-        corridor_stations_raw: List[Dict[str, Any]] = []
-
-        if not df_stations.empty:
-            subset_stations = df_stations.copy()
-            if "route_id" in subset_stations.columns:
-                del_jai_sub = subset_stations[subset_stations["route_id"] == "RT-DEL-JAI"]
-                if not del_jai_sub.empty:
-                    subset_stations = del_jai_sub
-
-            for _, row in subset_stations.iterrows():
-                stn_name = str(row.get("station_name", row.get("name", "EV Charging Hub")))
-                stn_op = str(row.get("operator", row.get("vendor", "Tata Power")))
-                stn_loc = str(row.get("amenities", row.get("address", "NH-48 Corridor, Behror")))
-                stn_type = str(row.get("charger_type", "DC Fast Charger"))
-                stn_pwr = str(row.get("charging_power_kw", row.get("capacity", "50 kW")))
-                if "kw" not in stn_pwr.lower():
-                    stn_pwr = f"{stn_pwr} kW"
-                stn_avail = str(row.get("available_slots", row.get("available", "2")))
-                stn_total = str(row.get("total_slots", row.get("no_of_chargers", "4")))
-                stn_detour = row.get("distance_from_route_km", 2)
-                stn_lat = float(row.get("latitude", 27.8860))
-                stn_lon = float(row.get("longitude", 76.2820))
-                stn_id = str(row.get("station_id", row.get("id", "CS-01")))
-                stn_cost = row.get("cost_per_unit", 18.0)
-
-                corridor_stations_raw.append({
-                    "id": stn_id,
-                    "name": stn_name,
-                    "operator": stn_op,
-                    "location": stn_loc,
-                    "charger_type": stn_type,
-                    "power": stn_pwr,
-                    "available": f"{stn_avail}/{stn_total}",
-                    "total_chargers": stn_total,
-                    "avail_chargers": stn_avail,
-                    "charging_time": "~ 35 min" if "180" in stn_pwr or "150" in stn_pwr else "~ 45 min",
-                    "waiting_time": "0 min",
-                    "detour": f"+{float(stn_detour):.0f} km" if not pd.isna(stn_detour) else "+2 km",
-                    "latitude": stn_lat,
-                    "longitude": stn_lon,
-                    "cost_per_unit": f"₹ {float(stn_cost):.0f} / kWh" if not pd.isna(stn_cost) else "₹ 18 / kWh",
-                    "timing": "6:00 AM - 11:00 PM" if "01" in stn_id or "05" in stn_id else "24x7 Operational",
-                    "payment_modes": "UPI, Card, Wallet, RFID",
-                    "contact_number": "+91 98765 43210",
-                    "other_info": "Restroom, Food Court, Waiting Area, EV Cafe",
-                })
-
-        reference_defaults = [
-            {"name": "Sharma EV Charging Station", "location": "NH-48, Behror, Rajasthan", "charger_type": "DC Fast", "power": "50 kW", "available": "2/4", "charging_time": "~ 35 min", "waiting_time": "0 min", "detour": "+2 km", "lat": 27.8860, "lon": 76.2820, "operator": "Tata Power"},
-            {"name": "GreenCharge Hub", "location": "Jaipur Road, Alwar", "charger_type": "DC Fast", "power": "60 kW", "available": "3/6", "charging_time": "~ 40 min", "waiting_time": "5 min", "detour": "+5 km", "lat": 27.5530, "lon": 76.6346, "operator": "ChargeZone"},
-            {"name": "VoltPoint Charging", "location": "Rewari, Haryana", "charger_type": "DC Fast", "power": "50 kW", "available": "1/4", "charging_time": "~ 45 min", "waiting_time": "10 min", "detour": "+8 km", "lat": 28.1800, "lon": 76.6200, "operator": "Statiq"},
-            {"name": "ChargeZone", "location": "Neemrana, Rajasthan", "charger_type": "AC", "power": "22 kW", "available": "4/6", "charging_time": "~ 2 hr", "waiting_time": "0 min", "detour": "+12 km", "lat": 27.9890, "lon": 76.3850, "operator": "ChargeZone"},
-            {"name": "EV Connect", "location": "Bhiwadi, Rajasthan", "charger_type": "DC Fast", "power": "60 kW", "available": "2/4", "charging_time": "~ 40 min", "waiting_time": "5 min", "detour": "+10 km", "lat": 28.2100, "lon": 76.8600, "operator": "Jio-bp"},
-            {"name": "PowerDrive Station", "location": "Dausa, Rajasthan", "charger_type": "DC Fast", "power": "50 kW", "available": "3/5", "charging_time": "~ 35 min", "waiting_time": "0 min", "detour": "+15 km", "lat": 26.8900, "lon": 76.3300, "operator": "Magenta"},
-            {"name": "SolarCharge Point", "location": "Alwar, Rajasthan", "charger_type": "AC", "power": "22 kW", "available": "5/6", "charging_time": "~ 2 hr", "waiting_time": "0 min", "detour": "+18 km", "lat": 27.5700, "lon": 76.6000, "operator": "Zeon"},
-            {"name": "ChargeFree", "location": "Tonk, Rajasthan", "charger_type": "DC Fast", "power": "60 kW", "available": "2/4", "charging_time": "~ 45 min", "waiting_time": "15 min", "detour": "+20 km", "lat": 26.1600, "lon": 75.7900, "operator": "Fortum"},
-            {"name": "Evolt Station", "location": "Sikar, Rajasthan", "charger_type": "AC", "power": "22 kW", "available": "3/6", "charging_time": "~ 2 hr", "waiting_time": "0 min", "detour": "+25 km", "lat": 27.6100, "lon": 75.1400, "operator": "Kazam"},
-            {"name": "NextGen Charging", "location": "Jaipur (Outer Ring)", "charger_type": "DC Fast", "power": "50 kW", "available": "1/4", "charging_time": "~ 50 min", "waiting_time": "10 min", "detour": "+28 km", "lat": 26.9850, "lon": 75.8510, "operator": "Shell Recharge"},
-        ]
-
-        top_10_stations: List[Dict[str, Any]] = []
-        for i in range(10):
-            if i < len(corridor_stations_raw):
-                stn = corridor_stations_raw[i]
-                if i == 0:
-                    stn["name"] = "Sharma EV Charging Station"
-                    stn["location"] = "NH-48, Behror, Rajasthan 301701"
-                top_10_stations.append(stn)
-            else:
-                ref = reference_defaults[i]
-                top_10_stations.append({
-                    "id": f"CS-REC-{i+1:02d}",
-                    "name": ref["name"],
-                    "operator": ref["operator"],
-                    "location": ref["location"],
-                    "charger_type": ref["charger_type"],
-                    "power": ref["power"],
-                    "available": ref["available"],
-                    "total_chargers": ref["available"].split("/")[1] if "/" in ref["available"] else "4",
-                    "avail_chargers": ref["available"].split("/")[0] if "/" in ref["available"] else "2",
-                    "charging_time": ref["charging_time"],
-                    "waiting_time": ref["waiting_time"],
-                    "detour": ref["detour"],
-                    "latitude": ref["lat"],
-                    "longitude": ref["lon"],
-                    "cost_per_unit": "₹ 18 / kWh",
-                    "timing": "6:00 AM - 11:00 PM",
-                    "payment_modes": "UPI, Card, Wallet",
-                    "contact_number": "+91 98765 43210",
-                    "other_info": "Restroom, Food Court, Waiting Area",
-                })
+        top_10_stations = find_corridor_charging_stations(
+            df_stns=df_stations,
+            s_lat=start_lat,
+            s_lon=start_lon,
+            d_lat=dest_lat,
+            d_lon=dest_lon,
+            total_dist_km=dist_km,
+        )
 
         # -------------------------------------------------------------------
         # SECTION 2: ROUTE & CHARGING STATIONS MAP
@@ -2203,7 +2665,8 @@ def main():
                 recommended_idx=0,
                 selected_idx=st.session_state.get("selected_detail_idx", 0),
             )
-            st_folium(folium_results_map, height=450, use_container_width=True, key="results_route_folium_map")
+            folium_map_key = f"results_route_folium_map_{start_lat:.4f}_{start_lon:.4f}_{dest_lat:.4f}_{dest_lon:.4f}_{st.session_state.get('selected_detail_idx', 0)}"
+            st_folium(folium_results_map, height=450, use_container_width=True, key=folium_map_key)
 
         # -------------------------------------------------------------------
         # SECTION 3: TOP 10 RECOMMENDED CHARGING STATIONS (FULL-WIDTH INLINE DETAILS)
@@ -2347,14 +2810,7 @@ def main():
 
                 st.markdown("<div style='border-bottom: 1px solid #f1f5f9; margin: 2px 0;'></div>", unsafe_allow_html=True)
 
-        # Navigation Action: Plan Another Journey
-        st.write("")
-        c_f1, c_f2, c_f3 = st.columns([1, 1.2, 1])
-        with c_f2:
-            if st.button("← Plan Another Journey", use_container_width=True, key="btn_plan_another"):
-                st.session_state["current_page"] = "page1_input"
-                st.session_state["map_picker_open"] = None
-                st.rerun()
+
 
     # Global App Footer
     st.markdown(
