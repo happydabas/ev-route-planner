@@ -1,0 +1,14 @@
+route_id,source,destination,distance_km,base_travel_time_min,avg_speed_kmh,source_lat,source_lon,dest_lat,dest_lon,highway_name,description
+RT-DEL-JAI,Delhi,Jaipur,280.0,270.0,62.2,28.6139,77.2090,26.9124,75.7873,NH48,Delhi-Jaipur Expressway Corridor
+RT-JAI-DEL,Jaipur,Delhi,280.0,270.0,62.2,26.9124,75.7873,28.6139,77.2090,NH48,Jaipur-Delhi Highway Corridor
+RT-MUM-PUN,Mumbai,Pune,150.0,180.0,50.0,19.0760,72.8777,18.5204,73.8567,Mumbai-Pune Exp,Mumbai-Pune Expressway
+RT-PUN-MUM,Pune,Mumbai,150.0,180.0,50.0,18.5204,73.8567,19.0760,72.8777,Mumbai-Pune Exp,Pune-Mumbai Expressway
+RT-BLR-CHE,Bengaluru,Chennai,345.0,360.0,57.5,12.9716,77.5946,13.0827,80.2707,NH44 / NH48,Bengaluru-Chennai National Highway
+RT-CHE-BLR,Chennai,Bengaluru,345.0,360.0,57.5,13.0827,80.2707,12.9716,77.5946,NH48 / NH44,Chennai-Bengaluru National Highway
+RT-DEL-AGR,Delhi,Agra,230.0,210.0,65.7,28.6139,77.2090,27.1767,78.0081,Yamuna Exp,Delhi-Agra Yamuna Expressway
+RT-AGR-DEL,Agra,Delhi,230.0,210.0,65.7,27.1767,78.0081,28.6139,77.2090,Yamuna Exp,Agra-Delhi Yamuna Expressway
+RT-BLR-MYS,Bengaluru,Mysuru,145.0,175.0,49.7,12.9716,77.5946,12.2958,76.6394,NH275,Bengaluru-Mysuru Access-Controlled Corridor
+RT-MYS-BLR,Mysuru,Bengaluru,145.0,175.0,49.7,12.2958,76.6394,12.9716,77.5946,NH275,Mysuru-Bengaluru Highway
+RT-MUM-SUR,Mumbai,Surat,290.0,310.0,56.1,19.0760,72.8777,21.1702,72.8311,NH48,Mumbai-Surat Western Corridor
+RT-SUR-MUM,Surat,Mumbai,290.0,310.0,56.1,21.1702,72.8311,19.0760,72.8777,NH48,Surat-Mumbai Coastal Highway
+

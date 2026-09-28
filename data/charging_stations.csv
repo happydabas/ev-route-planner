@@ -1,0 +1,94 @@
+station_id,station_name,route_id,distance_along_route_km,distance_from_route_km,charger_type,charging_power_kw,available_slots,total_slots,operator,amenities,latitude,longitude
+CS-DEL-JAI-01,Tata Power EZ - CyberHub Gurgaon,RT-DEL-JAI,32.0,0.8,CCS2 Fast DC,60,3,6,Tata Power,Cafe / Restroom / WiFi,28.4950,77.0890
+CS-DEL-JAI-02,Statiq SuperHub - Manesar Toll,RT-DEL-JAI,55.0,0.2,CCS2 Ultra-Fast DC,120,4,8,Statiq,Food Court / EV Lounge,28.3580,76.9380
+CS-DEL-JAI-03,Jio-bp Pulse - Dharuhera Highway,RT-DEL-JAI,82.0,0.5,CCS2 High-Power DC,150,2,6,Jio-bp Pulse,Convenience Store / Cafe,28.2050,76.7910
+CS-DEL-JAI-04,Zeon Charging - Neemrana Midway,RT-DEL-JAI,122.0,1.2,CCS2 Fast DC,60,3,4,Zeon,Restaurant / Restroom,27.9890,76.3850
+CS-DEL-JAI-05,ChargeZone HyperHub - Behror Plaza,RT-DEL-JAI,145.0,0.4,CCS2 Ultra-Fast DC,180,5,8,ChargeZone,24x7 Motel / Food Court,27.8860,76.2820
+CS-DEL-JAI-06,Kazam EV Station - Kotputli Bypass,RT-DEL-JAI,168.0,2.1,CCS2 Fast DC,50,2,4,Kazam,Fuel Station / Cafe,27.7010,76.1980
+CS-DEL-JAI-07,Magenta ChargeGrid - Shahpura Green,RT-DEL-JAI,215.0,0.6,CCS2 Fast DC,60,4,6,Magenta,Restroom / Cafe,27.3910,75.9620
+CS-DEL-JAI-08,Fortum Charge & Drive - Achrol Resort,RT-DEL-JAI,248.0,1.8,CCS2 High-Power DC,120,2,4,Fortum,Resort / Dining,27.1420,75.9120
+CS-DEL-JAI-09,Shell Recharge - Amer Jaipur North,RT-DEL-JAI,268.0,0.5,CCS2 Ultra-Fast DC,150,3,6,Shell,Coffee / Snacks / Restroom,26.9850,75.8510
+
+CS-JAI-DEL-01,Shell Recharge - Amer Express,RT-JAI-DEL,15.0,0.5,CCS2 Ultra-Fast DC,150,3,6,Shell,Coffee / Snacks / Restroom,26.9850,75.8510
+CS-JAI-DEL-02,Fortum Charge - Achrol Gateway,RT-JAI-DEL,35.0,1.5,CCS2 High-Power DC,120,2,4,Fortum,Resort / Dining,27.1420,75.9120
+CS-JAI-DEL-03,Magenta ChargeGrid - Shahpura,RT-JAI-DEL,68.0,0.6,CCS2 Fast DC,60,4,6,Magenta,Restroom / Cafe,27.3910,75.9620
+CS-JAI-DEL-04,Kazam EV - Kotputli Highway,RT-JAI-DEL,115.0,2.0,CCS2 Fast DC,50,2,4,Kazam,Fuel Station / Cafe,27.7010,76.1980
+CS-JAI-DEL-05,ChargeZone HyperHub - Behror,RT-JAI-DEL,138.0,0.4,CCS2 Ultra-Fast DC,180,5,8,ChargeZone,24x7 Motel / Food Court,27.8860,76.2820
+CS-JAI-DEL-06,Zeon Charging - Neemrana,RT-JAI-DEL,160.0,1.0,CCS2 Fast DC,60,3,4,Zeon,Restaurant / Restroom,27.9890,76.3850
+CS-JAI-DEL-07,Jio-bp Pulse - Dharuhera,RT-JAI-DEL,200.0,0.5,CCS2 High-Power DC,150,2,6,Jio-bp Pulse,Convenience Store / Cafe,28.2050,76.7910
+CS-JAI-DEL-08,Statiq SuperHub - Manesar,RT-JAI-DEL,228.0,0.2,CCS2 Ultra-Fast DC,120,4,8,Statiq,Food Court / EV Lounge,28.3580,76.9380
+CS-JAI-DEL-09,Tata Power EZ - CyberHub,RT-JAI-DEL,250.0,0.8,CCS2 Fast DC,60,3,6,Tata Power,Cafe / Restroom / WiFi,28.4950,77.0890
+
+CS-MUM-PUN-01,Tata Power - Vashi Navi Mumbai,RT-MUM-PUN,25.0,0.5,CCS2 Fast DC,60,4,6,Tata Power,Mall / Cafe / Restroom,19.0650,72.9980
+CS-MUM-PUN-02,Jio-bp Pulse - Panvel Toll Plaza,RT-MUM-PUN,48.0,0.3,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Food Court / Restroom,18.9890,73.1170
+CS-MUM-PUN-03,Statiq Express - Khalapur Food Mall,RT-MUM-PUN,72.0,0.1,CCS2 Ultra-Fast DC,150,5,8,Statiq,Food Mall / Starbucks / Restroom,18.8350,73.2840
+CS-MUM-PUN-04,ChargeZone - Lonavala Ghat Midway,RT-MUM-PUN,92.0,1.2,CCS2 Ultra-Fast DC,180,4,6,ChargeZone,Scenic Resort / Restaurant,18.7550,73.4090
+CS-MUM-PUN-05,Zeon Charging - Talegaon Toll,RT-MUM-PUN,120.0,0.4,CCS2 Fast DC,60,2,4,Zeon,Dhaba / Fuel Station,18.7290,73.6760
+CS-MUM-PUN-06,Magenta ChargeGrid - Wakad Pune,RT-MUM-PUN,138.0,0.8,CCS2 Fast DC,50,3,4,Magenta,Cafe / Restroom,18.5980,73.7650
+
+CS-PUN-MUM-01,Magenta ChargeGrid - Wakad Gateway,RT-PUN-MUM,15.0,0.8,CCS2 Fast DC,50,3,4,Magenta,Cafe / Restroom,18.5980,73.7650
+CS-PUN-MUM-02,Zeon Charging - Talegaon Expressway,RT-PUN-MUM,32.0,0.4,CCS2 Fast DC,60,2,4,Zeon,Dhaba / Fuel Station,18.7290,73.6760
+CS-PUN-MUM-03,ChargeZone - Lonavala Midway Hub,RT-PUN-MUM,60.0,1.2,CCS2 Ultra-Fast DC,180,4,6,ChargeZone,Scenic Resort / Restaurant,18.7550,73.4090
+CS-PUN-MUM-04,Statiq Express - Khalapur Food Mall,RT-PUN-MUM,80.0,0.1,CCS2 Ultra-Fast DC,150,5,8,Statiq,Food Mall / Starbucks / Restroom,18.8350,73.2840
+CS-PUN-MUM-05,Jio-bp Pulse - Panvel Toll,RT-PUN-MUM,105.0,0.3,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Food Court / Restroom,18.9890,73.1170
+CS-PUN-MUM-06,Tata Power - Vashi Plaza,RT-PUN-MUM,128.0,0.5,CCS2 Fast DC,60,4,6,Tata Power,Mall / Cafe / Restroom,19.0650,72.9980
+
+CS-BLR-CHE-01,Tata Power - Hosur Road Electronic City,RT-BLR-CHE,28.0,0.5,CCS2 Fast DC,60,4,6,Tata Power,Tech Park / Food Court,12.8450,77.6600
+CS-BLR-CHE-02,Zeon Charging - Hosur Flower City,RT-BLR-CHE,52.0,0.8,CCS2 High-Power DC,120,3,4,Zeon,Restaurant / Restroom,12.7400,77.8250
+CS-BLR-CHE-03,Statiq SuperHub - Krishnagiri Toll,RT-BLR-CHE,95.0,0.2,CCS2 Ultra-Fast DC,150,4,8,Statiq,Food Court / Fuel Station,12.5280,78.2140
+CS-BLR-CHE-04,ChargeZone - Vaniyambadi Midway,RT-BLR-CHE,155.0,0.6,CCS2 Ultra-Fast DC,180,5,6,ChargeZone,Hotel / Restroom / Snacks,12.6840,78.6180
+CS-BLR-CHE-05,Jio-bp Pulse - Ambur Highway Hub,RT-BLR-CHE,185.0,0.3,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Famous Biryani Cafe / Restroom,12.7910,78.7160
+CS-BLR-CHE-06,Magenta ChargeGrid - Vellore Bypass,RT-BLR-CHE,218.0,1.2,CCS2 Fast DC,60,2,4,Magenta,Shopping / Dining,12.9165,79.1325
+CS-BLR-CHE-07,Kazam EV Plaza - Ranipet Toll,RT-BLR-CHE,245.0,0.4,CCS2 Fast DC,50,2,4,Kazam,Restroom / Refreshments,12.9270,79.3330
+CS-BLR-CHE-08,Fortum Charge - Kanchipuram Junction,RT-BLR-CHE,285.0,1.5,CCS2 Ultra-Fast DC,150,4,6,Fortum,Silk Emporium / Restaurant,12.8340,79.7030
+CS-BLR-CHE-09,Shell Recharge - Sriperumbudur Corridor,RT-BLR-CHE,315.0,0.4,CCS2 High-Power DC,120,3,6,Shell,Cafe / Convenience Store,12.9700,79.9400
+
+CS-CHE-BLR-01,Shell Recharge - Sriperumbudur,RT-CHE-BLR,32.0,0.4,CCS2 High-Power DC,120,3,6,Shell,Cafe / Convenience Store,12.9700,79.9400
+CS-CHE-BLR-02,Fortum Charge - Kanchipuram,RT-CHE-BLR,62.0,1.5,CCS2 Ultra-Fast DC,150,4,6,Fortum,Silk Emporium / Restaurant,12.8340,79.7030
+CS-CHE-BLR-03,Kazam EV Plaza - Ranipet,RT-CHE-BLR,102.0,0.4,CCS2 Fast DC,50,2,4,Kazam,Restroom / Refreshments,12.9270,79.3330
+CS-CHE-BLR-04,Magenta ChargeGrid - Vellore,RT-CHE-BLR,130.0,1.2,CCS2 Fast DC,60,2,4,Magenta,Shopping / Dining,12.9165,79.1325
+CS-CHE-BLR-05,Jio-bp Pulse - Ambur Highway,RT-CHE-BLR,162.0,0.3,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Famous Biryani Cafe / Restroom,12.7910,78.7160
+CS-CHE-BLR-06,ChargeZone - Vaniyambadi,RT-CHE-BLR,192.0,0.6,CCS2 Ultra-Fast DC,180,5,6,ChargeZone,Hotel / Restroom / Snacks,12.6840,78.6180
+CS-CHE-BLR-07,Statiq SuperHub - Krishnagiri,RT-CHE-BLR,252.0,0.2,CCS2 Ultra-Fast DC,150,4,8,Statiq,Food Court / Fuel Station,12.5280,78.2140
+CS-CHE-BLR-08,Zeon Charging - Hosur,RT-CHE-BLR,295.0,0.8,CCS2 High-Power DC,120,3,4,Zeon,Restaurant / Restroom,12.7400,77.8250
+CS-CHE-BLR-09,Tata Power - Electronic City,RT-CHE-BLR,320.0,0.5,CCS2 Fast DC,60,4,6,Tata Power,Tech Park / Food Court,12.8450,77.6600
+
+CS-DEL-AGR-01,Tata Power EZ - Noida Expressway Gateway,RT-DEL-AGR,25.0,0.5,CCS2 Fast DC,60,3,6,Tata Power,Restroom / Cafe,28.5020,77.3820
+CS-DEL-AGR-02,Statiq SuperHub - Jewar Toll Plaza,RT-DEL-AGR,68.0,0.1,CCS2 Ultra-Fast DC,150,4,8,Statiq,Food Plaza / Restroom,28.1280,77.5560
+CS-DEL-AGR-03,ChargeZone Express - Mathura Yamuna Midway,RT-DEL-AGR,135.0,0.2,CCS2 Ultra-Fast DC,180,5,8,ChargeZone,Midway Food Mall / Motel,27.6520,77.7830
+CS-DEL-AGR-04,Jio-bp Pulse - Vrindavan Cut,RT-DEL-AGR,160.0,1.2,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Temple Stop / Cafe,27.5680,77.6980
+CS-DEL-AGR-05,Zeon Charging - Agra Expressway Toll,RT-DEL-AGR,205.0,0.3,CCS2 Fast DC,60,2,4,Zeon,Snack Point / Restroom,27.2280,77.9620
+
+CS-AGR-DEL-01,Zeon Charging - Agra Expressway Entry,RT-AGR-DEL,25.0,0.3,CCS2 Fast DC,60,2,4,Zeon,Snack Point / Restroom,27.2280,77.9620
+CS-AGR-DEL-02,Jio-bp Pulse - Vrindavan Highway,RT-AGR-DEL,72.0,1.2,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Temple Stop / Cafe,27.5680,77.6980
+CS-AGR-DEL-03,ChargeZone Express - Mathura Midway,RT-AGR-DEL,98.0,0.2,CCS2 Ultra-Fast DC,180,5,8,ChargeZone,Midway Food Mall / Motel,27.6520,77.7830
+CS-AGR-DEL-04,Statiq SuperHub - Jewar Plaza,RT-AGR-DEL,165.0,0.1,CCS2 Ultra-Fast DC,150,4,8,Statiq,Food Plaza / Restroom,28.1280,77.5560
+CS-AGR-DEL-05,Tata Power EZ - Greater Noida,RT-AGR-DEL,208.0,0.5,CCS2 Fast DC,60,3,6,Tata Power,Restroom / Cafe,28.5020,77.3820
+
+CS-BLR-MYS-01,Tata Power - Kengeri Metro Station,RT-BLR-MYS,18.0,0.4,CCS2 Fast DC,50,3,4,Tata Power,Metro Parking / Cafe,12.9080,77.4850
+CS-BLR-MYS-02,Zeon Charging - Bidadi Tollway,RT-BLR-MYS,38.0,0.2,CCS2 Fast DC,60,2,4,Zeon,Thatte Idli Food Plaza,12.7980,77.3850
+CS-BLR-MYS-03,Statiq Express - Ramanagara Midway,RT-BLR-MYS,55.0,0.1,CCS2 High-Power DC,120,4,6,Statiq,Silk City Cafe / Restroom,12.7210,77.2810
+CS-BLR-MYS-04,ChargeZone SuperHub - Maddur Plaza,RT-BLR-MYS,85.0,0.2,CCS2 Ultra-Fast DC,150,5,8,ChargeZone,Maddur Tiffany / Fuel Station,12.5840,77.0450
+CS-BLR-MYS-05,Jio-bp Pulse - Mandya Express Cut,RT-BLR-MYS,105.0,0.5,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Coffee Day / Restroom,12.5240,76.8980
+CS-BLR-MYS-06,Magenta ChargeGrid - Srirangapatna,RT-BLR-MYS,128.0,0.8,CCS2 Fast DC,60,2,4,Magenta,Heritage Food Court,12.4210,76.6920
+
+CS-MYS-BLR-01,Magenta ChargeGrid - Srirangapatna Heritage,RT-MYS-BLR,18.0,0.8,CCS2 Fast DC,60,2,4,Magenta,Heritage Food Court,12.4210,76.6920
+CS-MYS-BLR-02,Jio-bp Pulse - Mandya Hub,RT-MYS-BLR,42.0,0.5,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Coffee Day / Restroom,12.5240,76.8980
+CS-MYS-BLR-03,ChargeZone SuperHub - Maddur,RT-MYS-BLR,62.0,0.2,CCS2 Ultra-Fast DC,150,5,8,ChargeZone,Maddur Tiffany / Fuel Station,12.5840,77.0450
+CS-MYS-BLR-04,Statiq Express - Ramanagara,RT-MYS-BLR,92.0,0.1,CCS2 High-Power DC,120,4,6,Statiq,Silk City Cafe / Restroom,12.7210,77.2810
+CS-MYS-BLR-05,Zeon Charging - Bidadi,RT-MYS-BLR,110.0,0.2,CCS2 Fast DC,60,2,4,Zeon,Thatte Idli Food Plaza,12.7980,77.3850
+CS-MYS-BLR-06,Tata Power - Kengeri,RT-MYS-BLR,130.0,0.4,CCS2 Fast DC,50,3,4,Tata Power,Metro Parking / Cafe,12.9080,77.4850
+
+CS-MUM-SUR-01,Tata Power - Ghodbunder Thane,RT-MUM-SUR,35.0,0.6,CCS2 Fast DC,60,3,6,Tata Power,Mall / Cafe,19.2680,72.9680
+CS-MUM-SUR-02,Zeon Charging - Manor Toll Plaza,RT-MUM-SUR,88.0,0.2,CCS2 High-Power DC,120,3,4,Zeon,Food Plaza / Restroom,19.7420,72.9150
+CS-MUM-SUR-03,Statiq SuperHub - Charoti Naka,RT-MUM-SUR,118.0,0.3,CCS2 Ultra-Fast DC,150,4,8,Statiq,Highway Dhaba / Snacks,19.9880,72.8870
+CS-MUM-SUR-04,ChargeZone Express - Vapi Daman Cut,RT-MUM-SUR,175.0,0.5,CCS2 Ultra-Fast DC,180,5,8,ChargeZone,Star Hotel / Food Court,20.3720,72.9080
+CS-MUM-SUR-05,Jio-bp Pulse - Valsad Highway,RT-MUM-SUR,205.0,0.4,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Fuel Station / Cafe,20.6120,72.9320
+CS-MUM-SUR-06,Magenta ChargeGrid - Navsari Toll,RT-MUM-SUR,252.0,0.8,CCS2 Fast DC,60,2,4,Magenta,Restroom / Dining,20.9460,72.9280
+
+CS-SUR-MUM-01,Magenta ChargeGrid - Navsari,RT-SUR-MUM,40.0,0.8,CCS2 Fast DC,60,2,4,Magenta,Restroom / Dining,20.9460,72.9280
+CS-SUR-MUM-02,Jio-bp Pulse - Valsad,RT-SUR-MUM,88.0,0.4,CCS2 High-Power DC,120,3,6,Jio-bp Pulse,Fuel Station / Cafe,20.6120,72.9320
+CS-SUR-MUM-03,ChargeZone Express - Vapi Daman,RT-SUR-MUM,118.0,0.5,CCS2 Ultra-Fast DC,180,5,8,ChargeZone,Star Hotel / Food Court,20.3720,72.9080
+CS-SUR-MUM-04,Statiq SuperHub - Charoti,RT-SUR-MUM,175.0,0.3,CCS2 Ultra-Fast DC,150,4,8,Statiq,Highway Dhaba / Snacks,19.9880,72.8870
+CS-SUR-MUM-05,Zeon Charging - Manor,RT-SUR-MUM,205.0,0.2,CCS2 High-Power DC,120,3,4,Zeon,Food Plaza / Restroom,19.7420,72.9150
+CS-SUR-MUM-06,Tata Power - Ghodbunder,RT-SUR-MUM,258.0,0.6,CCS2 Fast DC,60,3,6,Tata Power,Mall / Cafe,19.2680,72.9680
